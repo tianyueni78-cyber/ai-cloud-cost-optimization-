@@ -31,6 +31,8 @@
 在 `sql/01_data_audit.sql` 开头创建视图：
 
 ```sql
+SET TimeZone = 'UTC';
+
 CREATE OR REPLACE VIEW raw_inventory AS
 SELECT * FROM read_csv_auto('data/resource_inventory.csv', all_varchar = true);
 
@@ -47,7 +49,7 @@ CREATE OR REPLACE VIEW raw_events AS
 SELECT * FROM read_csv_auto('data/business_events.csv', all_varchar = true);
 ```
 
-审计时先按文本读取，可以避免工具自动转换后掩盖原始格式问题。
+审计时先将会话时区设为 UTC，再按文本读取，可以避免本机时区改变月度边界，也可以防止工具自动转换后掩盖原始格式问题。
 
 ## B. 文件和结构检查
 
