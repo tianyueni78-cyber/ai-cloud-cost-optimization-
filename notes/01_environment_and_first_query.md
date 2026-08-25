@@ -179,3 +179,113 @@ python run_sql.py
 - 每个团队的资源池和 GPU 数量；
 - 每种 GPU 型号的资源数量；
 - 采购方式与工作负载的组合。
+
+## 4. 资源分布查询
+
+### 新增操作
+
+PowerShell 当前进程允许执行本地激活脚本，然后激活虚拟环境：
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+.venv\Scripts\Activate.ps1
+```
+
+`-Scope Process` 只影响当前 PowerShell 窗口，关闭窗口后失效，不会永久修改整个系统的执行策略。
+
+在 `sql/00_data_orientation.sql` 中新增三组汇总：
+
+```sql
+-- 按团队统计资源池数量和 GPU 总数
+SELECT
+    team_id,
+    COUNT(*) AS resource_pool_count,
+    SUM(gpu_count) AS total_gpu_count
+FROM read_csv_auto('data/resource_inventory.csv')
+GROUP BY team_id
+ORDER BY total_gpu_count DESC;
+
+-- 按 GPU 型号统计资源池数量和 GPU 总数
+SELECT
+    gpu_model,
+    COUNT(*) AS resource_pool_count,
+    SUM(gpu_count) AS total_gpu_count
+FROM read_csv_auto('data/resource_inventory.csv')
+GROUP BY gpu_model
+ORDER BY total_gpu_count DESC;
+
+-- 查看采购方式和工作负载的组合
+SELECT
+    procurement_model,
+    workload_type,
+    COUNT(*) AS resource_pool_count,
+    SUM(gpu_count) AS total_gpu_count
+FROM read_csv_auto('data/resource_inventory.csv')
+GROUP BY procurement_model, workload_type
+ORDER BY procurement_model, workload_type;
+```
+
+### 关键输出
+
+#### 团队资源
+
+| 团队 | 资源池数 | GPU 总数 |
+|---|---:|---:|
+| `TEAM-MIP` | 10 | 200 |
+| `TEAM-SRCH` | 9 | 168 |
+| `TEAM-DOC` | 8 | 160 |
+| `TEAM-FMT` | 8 | 136 |
+| `TEAM-TRUST` | 7 | 128 |
+| `TEAM-CONV` | 9 | 120 |
+| `TEAM-RES` | 7 | 104 |
+
+#### GPU 型号
+
+| GPU 型号 | 资源池数 | GPU 总数 |
+|---|---:|---:|
+| `A100-40GB` | 16 | 356 |
+| `L40S-48GB` | 14 | 248 |
+| `A100-80GB` | 15 | 232 |
+| `H100-80GB` | 13 | 180 |
+
+#### 采购方式汇总
+
+| 采购方式 | 资源池数 | GPU 总数 |
+|---|---:|---:|
+| `OnDemand` | 16 | 272 |
+| `Owned` | 10 | 180 |
+| `Reserved` | 19 | 316 |
+| `SavingsPlan` | 13 | 248 |
+
+#### 工作负载汇总
+
+| 工作负载 | 资源池数 | GPU 总数 |
+|---|---:|---:|
+| `Batch` | 17 | 288 |
+| `Inference` | 27 | 492 |
+| `Training` | 14 | 236 |
+
+### 结果说明
+
+- 公司共有 58 个资源池、1,016 张 GPU；资源池数和 GPU 张数不是同一个指标。
+- `TEAM-MIP` 的 GPU 数量最多，`TEAM-RES` 最少；这里只描述资源配置，尚不能判断使用效率或资源是否合理。
+- `A100-40GB` 数量最多，`H100-80GB` 数量最少；数量不代表成本大小，因为型号单价不同。
+- `Reserved` 的 GPU 数量最多；是否买多需要结合实际使用、合同和 SLA，不能只根据库存判断。
+- `Inference` 的 GPU 数量最多；这符合在线服务需要持续容量和备用空间的业务特点，但后续仍需用使用表验证。
+- 团队汇总、GPU 型号汇总和采购/负载汇总的 GPU 总数都等于 1,016，形成了第一次交叉核对。
+
+### 新学到的 SQL
+
+- `GROUP BY`：按一个或多个分类字段分组。
+- `COUNT(*)`：统计每组有多少行；这里代表资源池数量。
+- `SUM(gpu_count)`：累计每组包含的 GPU 张数。
+- `ORDER BY ... DESC`：按结果从大到小排序。
+- 同一份数据从不同维度汇总后，总量应当能够相互核对。
+
+### 操作说明
+
+同一个 `run_sql.py` 被执行多次，因此终端重复显示了前面的查询结果。这只是查询被重复运行，不代表 CSV 中的数据发生重复。
+
+## 更新后的下一步
+
+完成五张源表的行数、字段数量和行粒度盘点，建立 `reports/data_inventory.md`，再进入正式数据审计。
