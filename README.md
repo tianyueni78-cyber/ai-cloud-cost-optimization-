@@ -6,7 +6,7 @@
 
 > 项目状态：数据准备阶段。分析结果将在实际完成各阶段练习后逐步加入，不预先生成结论或标准答案。
 
-快速入口：[项目制学习中心](learning/README.md) · [公司背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md) · [工作模拟练习册](workbook.md) · [数据说明](data/README.md)
+快速入口：[项目制学习中心](learning/README.md) · [学习笔记](notes/README.md) · [公司背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md) · [工作模拟练习册](workbook.md) · [数据说明](data/README.md)
 
 ## 业务背景
 
@@ -85,6 +85,7 @@ ai-cloud-cost-optimization/
 │   ├── 00_end_to_end_workflow.md # 端到端工作流
 │   ├── 01...12_*.md              # 每个阶段的具体操作指南
 │   └── references/               # SQL、Pandas、Power BI 与验收手册
+├── notes/                        # 实际输入、输出、解释和踩坑记录
 ├── sql/                          # 你完成的 SQL 查询
 ├── notebooks/                    # 清洗、归因、预测与优化分析
 ├── dashboard/                    # Power BI 文件与仪表盘截图
