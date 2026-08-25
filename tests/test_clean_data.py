@@ -2,7 +2,15 @@ import unittest
 
 import pandas as pd
 
-from src.clean_data import clean_billing, clean_usage, normalize_id
+from src.clean_data import (
+    add_normalized_ids,
+    build_quality_summary,
+    clean_billing,
+    clean_usage,
+    convert_types,
+    normalize_id,
+    validate_cleaned,
+)
 
 
 class CleaningRulesTest(unittest.TestCase):
@@ -90,6 +98,121 @@ class CleaningRulesTest(unittest.TestCase):
         ])
         self.assertTrue(pd.isna(cleaned.loc[1, "team_id"]))
         self.assertEqual(stats["team_ids_inferred_from_inventory"], 1)
+
+
+class TypeConversionTest(unittest.TestCase):
+    def test_adds_normalized_ids_for_all_five_tables(self):
+        fixtures = {
+            "resource_usage": pd.DataFrame({
+                "usage_record_id": ["ur_001"],
+                "resource_pool_id": [" gpu_001 "],
+                "team_id": ["team_fmt"],
+                "product_id": ["prd_shared"],
+            }),
+            "cloud_billing": pd.DataFrame({
+                "billing_line_id": ["bill_001"],
+                "resource_pool_id": ["gpu_001"],
+                "team_id": [pd.NA],
+                "contract_id": [pd.NA],
+            }),
+            "resource_inventory": pd.DataFrame({
+                "resource_pool_id": ["gpu_001"],
+                "team_id": ["team_fmt"],
+                "product_id": ["prd_shared"],
+                "contract_id": [pd.NA],
+                "cost_center": ["cc_410"],
+            }),
+            "team_sla": pd.DataFrame({
+                "sla_id": ["sla_001"],
+                "team_id": ["team_fmt"],
+                "product_id": ["prd_shared"],
+            }),
+            "business_events": pd.DataFrame({
+                "event_id": ["evt_001"],
+                "team_id": [pd.NA],
+                "product_id": [pd.NA],
+            }),
+        }
+
+        for table_name, fixture in fixtures.items():
+            with self.subTest(table_name=table_name):
+                result = add_normalized_ids(table_name, fixture)
+                for column in fixture.columns:
+                    self.assertIn(f"{column}_normalized", result.columns)
+
+    def test_converts_dates_numbers_utc_and_boolean_without_filling_zero(self):
+        usage = convert_types("resource_usage", pd.DataFrame({
+            "timestamp_utc": ["2025-08-01T00:00:00Z"],
+            "gpu_utilization_pct": [""],
+        }))
+        inventory = convert_types("resource_inventory", pd.DataFrame({
+            "start_date": ["2025-08-01"],
+            "gpu_count": ["8"],
+        }))
+        sla = convert_types("team_sla", pd.DataFrame({
+            "interruptible_allowed": ["true"],
+        }))
+
+        self.assertEqual(str(usage["timestamp_utc"].dtype), "datetime64[us, UTC]")
+        self.assertTrue(pd.isna(usage.loc[0, "gpu_utilization_pct"]))
+        self.assertTrue(pd.api.types.is_datetime64_any_dtype(inventory["start_date"]))
+        self.assertTrue(pd.api.types.is_numeric_dtype(inventory["gpu_count"]))
+        self.assertEqual(str(sla["interruptible_allowed"].dtype), "boolean")
+        self.assertTrue(sla.loc[0, "interruptible_allowed"])
+
+
+class ValidationTest(unittest.TestCase):
+    @staticmethod
+    def valid_tables():
+        return {
+            "resource_usage": pd.DataFrame({
+                "timestamp_utc": ["2025-08-01T00:00:00Z"],
+                "resource_pool_id_normalized": ["GPU-001"],
+            }),
+            "cloud_billing": pd.DataFrame({
+                "resource_pool_id_normalized": ["GPU-001"],
+                "attributed_team_id": ["TEAM-FMT"],
+            }),
+            "resource_inventory": pd.DataFrame({
+                "resource_pool_id_normalized": ["GPU-001"],
+            }),
+        }
+
+    def test_rejects_duplicate_usage_business_key(self):
+        tables = self.valid_tables()
+        tables["resource_usage"] = pd.concat(
+            [tables["resource_usage"], tables["resource_usage"]],
+            ignore_index=True,
+        )
+        with self.assertRaisesRegex(ValueError, "业务键仍有重复"):
+            validate_cleaned(tables)
+
+    def test_rejects_missing_billing_attribution(self):
+        tables = self.valid_tables()
+        tables["cloud_billing"].loc[0, "attributed_team_id"] = pd.NA
+        with self.assertRaisesRegex(ValueError, "归属团队仍有空值"):
+            validate_cleaned(tables)
+
+    def test_rejects_unmatched_billing_pool(self):
+        tables = self.valid_tables()
+        tables["cloud_billing"].loc[0, "resource_pool_id_normalized"] = "GPU-999"
+        with self.assertRaisesRegex(ValueError, "资源池无法关联"):
+            validate_cleaned(tables)
+
+    def test_builds_quality_summary_with_required_columns(self):
+        result = build_quality_summary(
+            before={"resource_usage": 10},
+            after={"resource_usage": 8},
+            rule_stats={"exact_duplicate_rows_removed": 2},
+        )
+        self.assertEqual(
+            list(result.columns),
+            [
+                "table_name", "rows_before", "rows_after", "rows_removed",
+                "metric_name", "metric_value",
+            ],
+        )
+        self.assertEqual(result.loc[0, "rows_removed"], 2)
 
 
 if __name__ == "__main__":
