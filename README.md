@@ -4,7 +4,7 @@
 
 本项目模拟一家同时运行模型训练与在线推理业务的 AI 公司。项目将从原始云资源使用、账单、资源清单、SLA 和业务事件数据出发，完成数据审计、成本归因、趋势预测、资源优化、仪表盘设计和管理层汇报。
 
-> 项目状态：数据准备阶段。分析结果将在实际完成各阶段练习后逐步加入，不预先生成结论或标准答案。
+> 项目状态：已完成数据准备、数据审计和 Pandas 清洗管道，正在进入 SQL 探索分析。
 
 快速入口：[项目制学习中心](learning/README.md) · [学习笔记](notes/README.md) · [公司背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md) · [工作模拟练习册](workbook.md) · [数据说明](data/README.md)
 
@@ -79,7 +79,8 @@ ai-cloud-cost-optimization/
 │   └── README.md                 # 数据目录使用说明
 ├── docs/
 │   ├── company_background.md     # 完整公司与业务背景
-│   └── data_dictionary.md        # 字段定义、单位与业务规则
+│   ├── data_dictionary.md        # 字段定义、单位与业务规则
+│   └── superpowers/              # 清洗设计与实施计划
 ├── learning/                     # 从零完成项目的详细学习工作流
 │   ├── README.md                 # 学习顺序与导航
 │   ├── 00_end_to_end_workflow.md # 端到端工作流
@@ -88,6 +89,11 @@ ai-cloud-cost-optimization/
 ├── notes/                        # 实际输入、输出、解释和踩坑记录
 ├── sql/                          # 你完成的 SQL 查询
 ├── notebooks/                    # 清洗、归因、预测与优化分析
+├── src/
+│   └── clean_data.py             # 五表 Pandas 清洗管道
+├── tests/
+│   └── test_clean_data.py        # 清洗规则自动测试
+├── outputs/                      # 本地清洗结果，不上传 GitHub
 ├── dashboard/                    # Power BI 文件与仪表盘截图
 ├── reports/
 │   ├── data_inventory.md         # 五张原始数据表盘点
@@ -101,11 +107,21 @@ ai-cloud-cost-optimization/
 
 完整数据已经保存在 `data/`；`data/sample/` 中的同名文件用于在 GitHub 页面快速预览。
 
+## 运行数据清洗
+
+```powershell
+python -m unittest discover -s tests -v
+python src/clean_data.py
+```
+
+第一条命令验证清洗规则，第二条命令在 `outputs/cleaned/` 生成五张清洗 CSV 和 `quality_summary.csv`。原始 `data/` 不会被修改，`outputs/` 不上传 GitHub。
+
 ## 项目进度
 
 - [x] 准备业务背景和原始数据
 - [x] 完成数据字典
-- [ ] 完成数据质量审计
+- [x] 完成数据质量审计
+- [x] 建立 Pandas 数据清洗管道
 - [ ] 完成 SQL 探索分析
 - [ ] 建立成本归因模型
 - [ ] 完成成本与容量预测
@@ -126,7 +142,7 @@ ai-cloud-cost-optimization/
 具体工具将在分析过程中根据任务需要选择，预计包括：
 
 - SQL
-- Python
+- Python / Pandas
 - Jupyter Notebook
 - Power BI、Tableau 或其他可视化工具
 - Git 和 GitHub

@@ -6,11 +6,36 @@
 
 ## 软件、输入和输出
 
-- 软件：VS Code、DuckDB；需要复杂处理时使用 Python/Pandas。
+- 软件：VS Code、Python/Pandas；DuckDB 用于独立复核结果。
 - 输入：`data/*.csv` 和 `reports/data_audit.md`。
-- SQL：`sql/02_cleaning.sql`。
-- 可选 Notebook：`notebooks/01_data_cleaning.ipynb`。
-- 本地输出：`outputs/clean/*.parquet`，不提交 Git。
+- 清洗程序：`src/clean_data.py`。
+- 自动测试：`tests/test_clean_data.py`。
+- 本地输出：`outputs/cleaned/*.csv`，不提交 Git。
+
+## 本项目的实际执行方式
+
+先运行测试，再运行清洗：
+
+```powershell
+python -m unittest discover -s tests -v
+python src/clean_data.py
+```
+
+程序依次执行：
+
+1. 读取五张原始 CSV。
+2. 转换日期、UTC 时间、数值和布尔类型。
+3. 新增标准化 ID，不覆盖原始字段。
+4. 删除完全重复记录，并让 `-R` 修订记录优先。
+5. 为团队标签缺失的账单生成归属团队和归属来源。
+6. 验证业务键、资源池关联和团队归属。
+7. 验证全部通过后才写出五张清洗表和质量汇总。
+
+输出中的新增字段包括：
+
+- `*_normalized`：标准化 ID；
+- `attributed_team_id`：最终用于成本归属的团队；
+- `team_attribution_source`：团队来自账单还是资源清单。
 
 ## 先建立规则表
 
@@ -126,14 +151,18 @@ inventory["resource_pool_id_clean"] = (
 inventory["gpu_count_num"] = pd.to_numeric(inventory["gpu_count"], errors="coerce")
 ```
 
-## E. 导出 Parquet
+## E. 为什么本项目先输出 CSV
 
-Parquet 比 CSV 更适合分析层：保留数据类型、读取更快、文件更小。
+Parquet 更快、更小并能保存数据类型，但还需要额外的 Parquet 引擎。当前阶段继续使用 CSV，便于直接查看和导入 Power BI，也不增加依赖。数据量或读取耗时真正成为问题时再切换 Parquet。
 
-```sql
-COPY clean_inventory
-TO 'outputs/clean/resource_inventory.parquet'
-(FORMAT PARQUET);
+```text
+outputs/cleaned/
+├── resource_usage.csv
+├── cloud_billing.csv
+├── resource_inventory.csv
+├── team_sla.csv
+├── business_events.csv
+└── quality_summary.csv
 ```
 
 ## F. 清洗后必须重新验证
@@ -159,7 +188,7 @@ TO 'outputs/clean/resource_inventory.parquet'
 ├── 类型：TRY_CAST / to_datetime
 ├── 重复：业务键 + ROW_NUMBER
 ├── 关联：标准化键 + 覆盖率
-└── 输出：Parquet + 可重复脚本
+└── 输出：CSV + 质量汇总 + 可重复脚本
 ```
 
 ## 验收标准
@@ -173,8 +202,4 @@ TO 'outputs/clean/resource_inventory.parquet'
 
 ## 建议提交
 
-```powershell
-git add sql/02_cleaning.sql notebooks/01_data_cleaning.ipynb
-git commit -m "data: add reproducible cleaning pipeline"
-git push
-```
+提交代码、测试和文档，不提交 `outputs/` 中的衍生数据。
