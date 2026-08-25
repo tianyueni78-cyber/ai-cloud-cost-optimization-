@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 
 
@@ -46,6 +48,14 @@ UTC_TIMESTAMP_COLUMNS = {
     "team_sla": [],
     "business_events": ["start_timestamp_utc", "end_timestamp_utc"],
 }
+
+TABLE_NAMES = [
+    "resource_usage",
+    "cloud_billing",
+    "resource_inventory",
+    "team_sla",
+    "business_events",
+]
 
 
 def normalize_id(series: pd.Series) -> pd.Series:
@@ -209,3 +219,72 @@ def build_quality_summary(
         "table_name", "rows_before", "rows_after", "rows_removed",
         "metric_name", "metric_value",
     ])
+
+
+def run_pipeline(input_dir: Path, output_dir: Path) -> pd.DataFrame:
+    """读取五张原始表，验证并写出清洗结果。"""
+    input_dir = Path(input_dir).resolve()
+    output_dir = Path(output_dir).resolve()
+    if input_dir == output_dir:
+        raise ValueError("输入目录和输出目录不能相同")
+
+    input_paths = {
+        table_name: input_dir / f"{table_name}.csv"
+        for table_name in TABLE_NAMES
+    }
+    missing_files = [str(path) for path in input_paths.values() if not path.is_file()]
+    if missing_files:
+        raise FileNotFoundError("缺少输入文件：" + ", ".join(missing_files))
+
+    raw_tables = {
+        table_name: pd.read_csv(path, low_memory=False)
+        for table_name, path in input_paths.items()
+    }
+    rows_before = {name: len(table) for name, table in raw_tables.items()}
+
+    prepared = {
+        name: add_normalized_ids(name, convert_types(name, table))
+        for name, table in raw_tables.items()
+    }
+    cleaned_usage, usage_stats = clean_usage(prepared["resource_usage"])
+    cleaned_billing, billing_stats = clean_billing(
+        prepared["cloud_billing"],
+        prepared["resource_inventory"],
+    )
+    cleaned_tables = {
+        **prepared,
+        "resource_usage": cleaned_usage,
+        "cloud_billing": cleaned_billing,
+    }
+    validate_cleaned(cleaned_tables)
+
+    rows_after = {name: len(table) for name, table in cleaned_tables.items()}
+    summary = build_quality_summary(
+        rows_before,
+        rows_after,
+        {**usage_stats, **billing_stats},
+    )
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for table_name, table in cleaned_tables.items():
+        table.to_csv(output_dir / f"{table_name}.csv", index=False)
+    summary.to_csv(output_dir / "quality_summary.csv", index=False)
+    return summary
+
+
+def format_output_message(output_dir: Path) -> str:
+    """返回兼容 Windows 基础终端编码的完成提示。"""
+    relative_output = "/".join(Path(output_dir).parts[-2:])
+    return f"Cleaned files written to: {relative_output}"
+
+
+def main() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    output_dir = project_root / "outputs" / "cleaned"
+    summary = run_pipeline(project_root / "data", output_dir)
+    print(summary.to_string(index=False))
+    print(f"\n{format_output_message(output_dir)}")
+
+
+if __name__ == "__main__":
+    main()

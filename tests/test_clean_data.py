@@ -1,4 +1,7 @@
 import unittest
+import shutil
+from pathlib import Path
+from uuid import uuid4
 
 import pandas as pd
 
@@ -8,7 +11,9 @@ from src.clean_data import (
     clean_billing,
     clean_usage,
     convert_types,
+    format_output_message,
     normalize_id,
+    run_pipeline,
     validate_cleaned,
 )
 
@@ -213,6 +218,76 @@ class ValidationTest(unittest.TestCase):
             ],
         )
         self.assertEqual(result.loc[0, "rows_removed"], 2)
+
+
+class PipelineTest(unittest.TestCase):
+    def test_output_message_is_safe_for_windows_terminal(self):
+        message = format_output_message(Path("D:/南工/项目/outputs/cleaned"))
+
+        message.encode("cp1252")
+        self.assertIn("outputs/cleaned", message)
+
+    def test_writes_six_outputs_without_changing_inputs(self):
+        temp_parent = Path("outputs") / "test-temp"
+        temp_parent.mkdir(parents=True, exist_ok=True)
+        root = temp_parent / f"pipeline-{uuid4().hex}"
+        root.mkdir()
+        try:
+            input_dir = root / "data"
+            output_dir = root / "outputs" / "cleaned"
+            input_dir.mkdir()
+
+            tables = {
+                "resource_usage": CleaningRulesTest.usage_fixture(),
+                "cloud_billing": pd.DataFrame({
+                    "billing_line_id": ["BILL-001", "BILL-002"],
+                    "resource_pool_id": ["GPU-001", "GPU-002"],
+                    "team_id": ["TEAM-FMT", pd.NA],
+                    "contract_id": [pd.NA, "CTR-002"],
+                }),
+                "resource_inventory": pd.DataFrame({
+                    "resource_pool_id": ["GPU-001", "GPU-002"],
+                    "team_id": ["TEAM-FMT", "TEAM-SRCH"],
+                    "product_id": ["PRD-SHARED", "PRD-SHARED"],
+                    "contract_id": [pd.NA, "CTR-002"],
+                    "cost_center": ["CC-410", "CC-420"],
+                }),
+                "team_sla": pd.DataFrame({
+                    "sla_id": ["SLA-001"],
+                    "team_id": ["TEAM-FMT"],
+                    "product_id": ["PRD-SHARED"],
+                    "interruptible_allowed": ["false"],
+                }),
+                "business_events": pd.DataFrame({
+                    "event_id": ["EVT-001"],
+                    "team_id": ["TEAM-FMT"],
+                    "product_id": ["PRD-SHARED"],
+                    "start_timestamp_utc": ["2025-08-01T00:00:00Z"],
+                }),
+            }
+            for table_name, table in tables.items():
+                table.to_csv(input_dir / f"{table_name}.csv", index=False)
+            original_bytes = {
+                path.name: path.read_bytes() for path in input_dir.glob("*.csv")
+            }
+
+            summary = run_pipeline(input_dir, output_dir)
+
+            expected_files = {
+                *(f"{name}.csv" for name in tables),
+                "quality_summary.csv",
+            }
+            self.assertEqual(
+                {path.name for path in output_dir.glob("*.csv")},
+                expected_files,
+            )
+            self.assertFalse(summary.empty)
+            self.assertEqual(
+                original_bytes,
+                {path.name: path.read_bytes() for path in input_dir.glob("*.csv")},
+            )
+        finally:
+            shutil.rmtree(root)
 
 
 if __name__ == "__main__":
