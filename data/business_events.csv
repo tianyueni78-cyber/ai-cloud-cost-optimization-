@@ -1,0 +1,28 @@
+event_id,event_type,start_timestamp_utc,end_timestamp_utc,team_id,product_id,region,severity,expected_impact,event_description,source_system
+EVT-001,Launch,2025-09-15T02:00:00Z,2025-09-22T23:00:00Z,TEAM-SRCH,PRD-KNOW,,medium,检索调用量可能上升,企业知识智能 2.0 分批发布,release_calendar
+EVT-002,Customer,2025-10-06T00:00:00Z,,TEAM-CONV,PRD-CONV,us-east-1,high,北美请求量逐步增加,大型零售客户进入生产环境,crm
+EVT-003,Campaign,2025-11-24T00:00:00Z,2025-12-02T23:00:00Z,TEAM-CONV,PRD-CONV,us-east-1,high,短期并发请求上升,客户年度促销活动窗口,crm
+EVT-004,TrainingRun,2025-08-18T08:00:00Z,2025-08-29T20:00:00Z,TEAM-FMT,PRD-SHARED,us-east-1,medium,训练资源需求增加,多语言基础模型继续预训练,mlops
+EVT-005,TrainingRun,2025-12-05T00:00:00Z,2025-12-21T18:00:00Z,TEAM-FMT,PRD-SHARED,ap-southeast-1,high,训练资源需求增加,区域语言模型蒸馏项目,mlops
+EVT-006,TrainingRun,2026-03-09T04:00:00Z,2026-03-27T22:00:00Z,TEAM-FMT,PRD-SHARED,us-east-1,high,训练资源需求增加,新一代对话模型训练阶段,mlops
+EVT-007,Customer,2026-01-12T00:00:00Z,,TEAM-DOC,PRD-DOC,ap-southeast-1,medium,文档处理量逐步增加,区域银行客户开始批量迁移历史文档,crm
+EVT-008,Incident,2025-12-14T09:00:00Z,2025-12-14T15:00:00Z,TEAM-MIP,PRD-SHARED,ap-southeast-1,critical,可用性和延迟可能受到影响,区域网络异常触发服务切换,incident_manager
+EVT-009,Incident,2026-04-03T13:00:00Z,2026-04-03T17:00:00Z,TEAM-CONV,PRD-CONV,us-east-1,high,部分端点可能降级,模型服务发布后出现回滚,incident_manager
+EVT-010,Migration,2026-02-02T00:00:00Z,2026-03-15T23:00:00Z,TEAM-SRCH,PRD-KNOW,,medium,单位吞吐和显存需求可能变化,部分重排服务迁移到新模型版本,change_manager
+EVT-011,Migration,2026-05-04T00:00:00Z,2026-06-10T23:00:00Z,TEAM-DOC,PRD-DOC,,medium,资源结构可能变化,文档分类模型切换到统一平台端点,change_manager
+EVT-012,Procurement,2025-08-01T00:00:00Z,,TEAM-RES,PRD-SHARED,us-east-1,info,新增固定容量,研究计算年度容量合同生效,procurement
+EVT-013,Procurement,2026-01-01T00:00:00Z,,TEAM-CONV,PRD-CONV,ap-southeast-1,info,增加承诺覆盖,亚太推理节省计划生效,procurement
+EVT-014,Pricing,2026-04-01T00:00:00Z,,,,ap-southeast-1,info,部分按需价格调整,云厂商更新亚太区域 GPU 价目表,vendor_notice
+EVT-015,Capacity,2026-06-15T00:00:00Z,2026-07-05T23:00:00Z,TEAM-MIP,PRD-SHARED,ap-southeast-1,high,按需扩容速度可能下降,供应商提示 H100 容量紧张,vendor_notice
+EVT-016,Customer,2025-08-25T00:00:00Z,,TEAM-DOC,PRD-DOC,us-east-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-017,Customer,2025-08-25T00:00:00Z,,TEAM-SRCH,PRD-KNOW,ap-southeast-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-018,Customer,2025-09-25T00:00:00Z,,TEAM-DOC,PRD-DOC,us-east-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-019,Customer,2025-10-25T00:00:00Z,,TEAM-SRCH,PRD-KNOW,ap-southeast-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-020,Customer,2025-11-25T00:00:00Z,,TEAM-DOC,PRD-DOC,us-east-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-021,Customer,2025-12-25T00:00:00Z,,TEAM-SRCH,PRD-KNOW,ap-southeast-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-022,Customer,2026-01-25T00:00:00Z,,TEAM-DOC,PRD-DOC,us-east-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-023,Customer,2026-02-25T00:00:00Z,,TEAM-SRCH,PRD-KNOW,ap-southeast-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-024,Customer,2026-03-25T00:00:00Z,,TEAM-DOC,PRD-DOC,us-east-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-025,Customer,2026-04-25T00:00:00Z,,TEAM-SRCH,PRD-KNOW,ap-southeast-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-026,Customer,2026-05-25T00:00:00Z,,TEAM-DOC,PRD-DOC,us-east-1,low,业务量小幅变化,中型企业客户上线,crm
+EVT-027,Customer,2026-06-25T00:00:00Z,,TEAM-SRCH,PRD-KNOW,ap-southeast-1,low,业务量小幅变化,中型企业客户上线,crm

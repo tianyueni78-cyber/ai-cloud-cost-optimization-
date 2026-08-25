@@ -1,0 +1,15 @@
+sla_id,team_id,product_id,workload_type,region,effective_from,effective_to,priority_tier,availability_target_pct,p95_latency_target_ms,max_queue_time_seconds,min_spare_capacity_pct,rto_minutes,interruptible_allowed,business_owner
+SLA-001,TEAM-FMT,PRD-SHARED,Batch,ap-southeast-1,2025-08-01,,P2,,,3600,5,,true,模型平台主管
+SLA-002,TEAM-FMT,PRD-SHARED,Training,ap-southeast-1,2025-08-01,,P2,,,7200,5,,true,模型平台主管
+SLA-003,TEAM-SRCH,PRD-KNOW,Batch,ap-southeast-1,2025-08-01,,P2,,,3600,5,,true,搜索产品负责人
+SLA-004,TEAM-SRCH,PRD-KNOW,Inference,ap-southeast-1,2025-08-01,,P1,99.9,650,,15,120,true,搜索产品负责人
+SLA-005,TEAM-CONV,PRD-CONV,Batch,us-east-1,2025-08-01,,P2,,,3600,5,,true,对话产品负责人
+SLA-006,TEAM-CONV,PRD-CONV,Inference,us-east-1,2025-08-01,,P0,99.95,350,,25,30,false,对话产品负责人
+SLA-007,TEAM-DOC,PRD-DOC,Training,ap-southeast-1,2025-08-01,,P2,,,7200,5,,true,文档产品负责人
+SLA-008,TEAM-DOC,PRD-DOC,Batch,ap-southeast-1,2025-08-01,,P2,,,3600,5,,true,文档产品负责人
+SLA-009,TEAM-MIP,PRD-SHARED,Batch,ap-southeast-1,2025-08-01,,P2,,,3600,5,,true,平台平台主管
+SLA-010,TEAM-MIP,PRD-SHARED,Inference,ap-southeast-1,2025-08-01,,P0,99.95,350,,25,30,false,平台平台主管
+SLA-011,TEAM-TRUST,PRD-CONV,Batch,ap-southeast-1,2025-08-01,,P2,,,3600,5,,true,安全平台主管
+SLA-012,TEAM-TRUST,PRD-CONV,Inference,ap-southeast-1,2025-08-01,,P0,99.95,350,,25,30,false,安全平台主管
+SLA-013,TEAM-RES,PRD-SHARED,Batch,us-east-1,2025-08-01,,P3,,,3600,5,,true,研究平台主管
+SLA-014,TEAM-RES,PRD-SHARED,Training,us-east-1,2025-08-01,,P3,,,7200,5,,true,研究平台主管
