@@ -90,6 +90,7 @@ ai-cloud-cost-optimization/
 ├── notebooks/                    # 清洗、归因、预测与优化分析
 ├── dashboard/                    # Power BI 文件与仪表盘截图
 ├── reports/
+│   ├── data_inventory.md         # 五张原始数据表盘点
 │   ├── data_audit.md             # 数据审计报告
 │   ├── optimization_proposal.md  # 成本优化建议
 │   └── executive_summary.md      # 管理层摘要
