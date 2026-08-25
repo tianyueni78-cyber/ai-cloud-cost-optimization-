@@ -69,21 +69,30 @@
 ```text
 ai-cloud-cost-optimization/
 ├── data/
-│   ├── sample/
-│   └── README.md
-├── sql/
-├── notebooks/
-├── dashboard/
-├── reports/
+│   ├── sample/                   # GitHub 快速预览用的小样本
+│   ├── resource_usage.csv        # 小时级 GPU 使用与业务量数据
+│   ├── cloud_billing.csv         # 云账单与采购费用明细
+│   ├── team_sla.csv              # 团队 SLA 与业务关键等级
+│   ├── resource_inventory.csv    # GPU 资源池与采购信息
+│   ├── business_events.csv       # 业务、技术和采购事件
+│   ├── manifest.md               # 文件行数、大小与校验值
+│   └── README.md                 # 数据目录使用说明
 ├── docs/
-│   ├── company_background.md
-│   └── data_dictionary.md
-├── workbook.md
-├── README.md
-└── LICENSE
+│   ├── company_background.md     # 完整公司与业务背景
+│   └── data_dictionary.md        # 字段定义、单位与业务规则
+├── sql/                          # 你完成的 SQL 查询
+├── notebooks/                    # 清洗、归因、预测与优化分析
+├── dashboard/                    # Power BI 文件与仪表盘截图
+├── reports/
+│   ├── data_audit.md             # 数据审计报告
+│   ├── optimization_proposal.md  # 成本优化建议
+│   └── executive_summary.md      # 管理层摘要
+├── workbook.md                   # 七阶段工作模拟练习册
+├── README.md                     # 作品集首页
+└── LICENSE                       # MIT 许可证
 ```
 
-完整数据量较大时，将通过 GitHub Release 提供下载；仓库中的 `data/sample/` 用于存放可快速预览的小规模样本。
+完整数据已经保存在 `data/`；`data/sample/` 中的同名文件用于在 GitHub 页面快速预览。
 
 ## 项目进度
 
