@@ -1,5 +1,12 @@
 -- 第四轮数据审计：为剩余异常确定处理规则
 -- 运行：python run_sql.py sql/05_data_audit_resolution.sql
+--
+-- 【迁移到其他项目】
+-- 可复用：关联质量状态解释空值、用权威维表回填归属、比较冲突记录内容。
+-- 要替换：状态优先级、权威数据源、合同规则、修订记录的识别方式和保留规则。
+-- 本项目特例：ID 后缀 -R 表示修订版；其他项目绝不能默认沿用这一规则。
+-- 注意：只有证据证明哪条更新或更权威时才能删除冲突记录，不能随便保留第一行。
+-- 完成标准：每类异常都有可解释、可执行、可验证的处理规则。
 
 CREATE OR REPLACE TEMP VIEW raw_usage AS
 SELECT * FROM read_csv_auto('data/resource_usage.csv', all_varchar = true);
