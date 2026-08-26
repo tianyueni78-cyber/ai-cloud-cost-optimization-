@@ -6,7 +6,7 @@
 
 > 项目状态：已完成数据准备、数据审计和 Pandas 清洗管道，正在进入 SQL 探索分析。
 
-快速入口：[学习入口](learning/README.md) · [九阶段模板](learning/数据分析九阶段填空模板.md) · [指标与数据映射](learning/指标与数据映射.md) · [代码翻译与自检](learning/代码翻译与自检/README.md) · [公司背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md) · [工作模拟练习册](workbook.md)
+快速入口：[学习入口](learning/README.md) · [九阶段模板](learning/数据分析九阶段填空模板.md) · [指标与数据映射](learning/指标与数据映射.md) · [采购知识](learning/采购知识/README.md) · [代码翻译与自检](learning/代码翻译与自检/README.md) · [公司背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md) · [工作模拟练习册](workbook.md)
 
 ## 业务背景
 
@@ -84,6 +84,7 @@ ai-cloud-cost-optimization/
 │   ├── README.md                 # 唯一学习入口
 │   ├── 数据分析九阶段填空模板.md  # 思路、模板、避坑和完成标准
 │   ├── 指标与数据映射.md          # 场景、完整公式和数据映射
+│   ├── 采购知识/                  # GPU采购机制、判断框架和分析公式
 │   ├── 代码翻译与自检/            # SQL、Pandas模板、自检程序和完整范例
 │   ├── 成果交付指南.md            # Power BI、管理摘要和作品集
 │   └── references/               # SQL、Pandas、Power BI 按需速查
