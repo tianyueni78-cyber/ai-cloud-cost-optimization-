@@ -6,7 +6,7 @@
 
 > 项目状态：已完成数据准备、数据审计和 Pandas 清洗管道，正在进入 SQL 探索分析。
 
-快速入口：[项目制学习中心](learning/README.md) · [学习笔记](notes/README.md) · [公司背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md) · [工作模拟练习册](workbook.md) · [数据说明](data/README.md)
+快速入口：[学习入口](learning/README.md) · [九阶段模板](learning/数据分析九阶段填空模板.md) · [指标与数据映射](learning/指标与数据映射.md) · [公司背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md) · [工作模拟练习册](workbook.md)
 
 ## 业务背景
 
@@ -79,14 +79,13 @@ ai-cloud-cost-optimization/
 │   └── README.md                 # 数据目录使用说明
 ├── docs/
 │   ├── company_background.md     # 完整公司与业务背景
-│   ├── data_dictionary.md        # 字段定义、单位与业务规则
-│   └── superpowers/              # 清洗设计与实施计划
-├── learning/                     # 从零完成项目的详细学习工作流
-│   ├── README.md                 # 学习顺序与导航
-│   ├── 00_end_to_end_workflow.md # 端到端工作流
-│   ├── 01...12_*.md              # 每个阶段的具体操作指南
-│   └── references/               # SQL、Pandas、Power BI 与验收手册
-├── notes/                        # 实际输入、输出、解释和踩坑记录
+│   └── data_dictionary.md        # 字段定义、单位与业务规则
+├── learning/
+│   ├── README.md                 # 唯一学习入口
+│   ├── 数据分析九阶段填空模板.md  # 思路、模板、避坑和完成标准
+│   ├── 指标与数据映射.md          # 场景、完整公式和数据映射
+│   ├── 成果交付指南.md            # Power BI、管理摘要和作品集
+│   └── references/               # SQL、Pandas、Power BI 按需速查
 ├── sql/                          # 你完成的 SQL 查询
 ├── notebooks/                    # 清洗、归因、预测与优化分析
 ├── src/
@@ -97,9 +96,7 @@ ai-cloud-cost-optimization/
 ├── dashboard/                    # Power BI 文件与仪表盘截图
 ├── reports/
 │   ├── data_inventory.md         # 五张原始数据表盘点
-│   ├── data_audit.md             # 数据审计报告
-│   ├── optimization_proposal.md  # 成本优化建议
-│   └── executive_summary.md      # 管理层摘要
+│   └── data_audit.md             # 数据审计报告
 ├── workbook.md                   # 七阶段工作模拟练习册
 ├── README.md                     # 作品集首页
 └── LICENSE                       # MIT 许可证
