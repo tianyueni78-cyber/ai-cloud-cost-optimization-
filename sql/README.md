@@ -118,11 +118,11 @@ python src/clean_data.py
 
 ### 通常可以保留
 
-- `DESCRIBE`、`LIMIT`、`COUNT` 的数据认识结构；
-- 空值、重复、范围、枚举和关联率的审计思路；
-- `GROUP BY`、占比、环比和窗口函数的分析方法；
-- “先原始数据审计，再清洗，再正式分析”的顺序；
-- 清洗前后对账和总账归因核对。
+- `DESCRIBE`、`LIMIT`、`COUNT` 的数据认识结构——通用教程：[认识数据](../learning/03_data_orientation.md)；项目实现：[00](00_data_orientation.sql)、[01](01_source_inventory.sql)。
+- 空值、重复、范围、枚举和关联率的审计思路——通用教程：[数据审计](../learning/04_data_audit.md)；项目实现：[02](02_data_audit.sql)、[03](03_data_audit_detail.sql)、[04](04_data_audit_context.sql)、[05](05_data_audit_resolution.sql)。
+- `GROUP BY`、占比、环比和窗口函数的分析方法——通用教程：[SQL探索](../learning/06_sql_exploration.md)；项目实现：[06](06_business_overview.sql)。
+- “先原始数据审计，再清洗，再正式分析”的顺序——总流程：[端到端工作流](../learning/00_end_to_end_workflow.md)；清洗方法：[数据清洗](../learning/05_data_cleaning.md)。
+- 清洗前后对账和总账归因核对——通用教程：[数据清洗](../learning/05_data_cleaning.md)、[成本归因](../learning/07_cost_attribution.md)；项目清洗实现：[clean_data.py](../src/clean_data.py)。
 
 ### 必须重新确认和替换
 
