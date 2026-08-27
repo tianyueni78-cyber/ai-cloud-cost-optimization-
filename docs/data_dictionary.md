@@ -57,6 +57,13 @@
 
 `business_volume` 只能在相同 `volume_unit` 和可比较负载范围内汇总，不能把请求数、训练作业数和千页数直接相加。
 
+### 遥测与修订规则
+
+- `complete` 记录的 GPU 利用率、显存利用率和可用性应完整。
+- `partial` 表示只收到部分遥测指标，GPU 或显存利用率允许为空；空值不代表0。
+- `late` 表示可用性指标尚未到达，可用性允许暂时为空；空值不代表0。
+- 同一 `timestamp_utc + resource_pool_id` 出现多个版本时，`usage_record_id` 带 `-R` 的记录是修订版本。不能按业务时间判断新旧，因为两个版本的业务时间相同。
+
 ## 4. `cloud_billing.csv`
 
 每行代表账单系统中的一条费用记录，同一资源池和使用月份可以对应多条记录。
@@ -82,6 +89,7 @@
 
 ### 计费规则
 
+- `Reserved` 和 `SavingsPlan` 必须带 `contract_id`；`OnDemand` 和 `Owned` 不要求合同编号。
 - `Usage` 按实际计费 GPU 小时和费率计算。
 - `Commitment` 是承诺采购的固定期间费用，不因实际利用率自动减少。
 - `UnusedCommitment` 是内部管理口径，用于呈现未被工作负载覆盖的承诺成本；不应与承诺费用重复计入总账。
