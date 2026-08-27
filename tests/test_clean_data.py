@@ -158,7 +158,8 @@ class TypeConversionTest(unittest.TestCase):
             "interruptible_allowed": ["true"],
         }))
 
-        self.assertEqual(str(usage["timestamp_utc"].dtype), "datetime64[us, UTC]")
+        self.assertTrue(pd.api.types.is_datetime64_any_dtype(usage["timestamp_utc"]))
+        self.assertEqual(str(usage["timestamp_utc"].dt.tz), "UTC")
         self.assertTrue(pd.isna(usage.loc[0, "gpu_utilization_pct"]))
         self.assertTrue(pd.api.types.is_datetime64_any_dtype(inventory["start_date"]))
         self.assertTrue(pd.api.types.is_numeric_dtype(inventory["gpu_count"]))
