@@ -2,6 +2,8 @@
 
 一个面向云基础设施与FinOps岗位的端到端GPU成本优化作品集。项目基于一家虚拟B2B AI公司的12个月业务数据，从数据审计、成本归因和根因分析出发，完成业务预测、容量规划、优化测算和管理层交付。
 
+🌐 **[在线打开GPU FinOps管理驾驶舱](https://tianyueni78-cyber.github.io/ai-cloud-cost-optimization-/)**
+
 ![GPU FinOps管理驾驶舱](dashboard/preview.png)
 
 ## 项目成果
