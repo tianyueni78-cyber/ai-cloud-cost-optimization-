@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GPU FinOps 管理驾驶舱</title>
+  <style>
+    :root{--ink:#172033;--muted:#667085;--line:#e6eaf0;--paper:#f4f7fb;--card:#fff;--navy:#14294b;--blue:#2878ff;--cyan:#12b8c4;--amber:#f5a623;--red:#e45454;--green:#2ca66f}
+    *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 "Segoe UI","Microsoft YaHei",sans-serif}
+    .shell{max-width:1480px;margin:auto;padding:26px}.top{background:linear-gradient(120deg,#10213f,#1b416f);color:white;border-radius:18px;padding:26px 30px;display:flex;justify-content:space-between;gap:30px;box-shadow:0 14px 34px #18345b26}
+    h1{font-size:28px;margin:0 0 5px}.subtitle{color:#c7d8ef}.badge{display:inline-block;padding:6px 10px;border-radius:99px;background:#2d5b8e;color:#dcecff;font-size:12px}.controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.control label{display:block;color:#bfd0e8;font-size:11px;margin-bottom:4px}.control select{border:1px solid #ffffff35;background:#fff;color:#26354b;padding:9px 34px 9px 11px;border-radius:8px}
+    .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin:18px 0}.kpi,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 5px 18px #18345b0a}.kpi{padding:17px}.kpi .label{font-size:12px;color:var(--muted)}.kpi .value{font-size:23px;font-weight:750;margin:5px 0 2px}.kpi .note{font-size:11px;color:var(--muted)}.kpi.accent{border-top:4px solid var(--blue)}.kpi.warn{border-top:4px solid var(--amber)}.kpi.good{border-top:4px solid var(--green)}
+    .insight{display:flex;align-items:center;gap:15px;background:#eaf2ff;border-left:4px solid var(--blue);border-radius:10px;padding:13px 17px;margin-bottom:16px}.insight b{color:#154b9b}.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-bottom:16px}.grid.equal{grid-template-columns:1fr 1fr}.card{padding:18px 20px;min-height:320px}.card h2{font-size:16px;margin:0}.card .desc{font-size:12px;color:var(--muted);margin:3px 0 14px}.chart{width:100%;height:230px}.axis{stroke:#dfe4ec;stroke-width:1}.line{fill:none;stroke:var(--blue);stroke-width:3}.area{fill:url(#costGradient)}.point{fill:white;stroke:var(--blue);stroke-width:2}.chart-label{fill:#748097;font-size:11px}.bars{display:flex;flex-direction:column;gap:10px}.bar-row{display:grid;grid-template-columns:95px 1fr 82px;align-items:center;gap:10px;font-size:12px}.bar-track{height:12px;background:#edf1f6;border-radius:8px;overflow:hidden}.bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--cyan))}.money{text-align:right;font-variant-numeric:tabular-nums}
+    .legend{display:flex;gap:15px;font-size:11px;color:var(--muted);margin-bottom:8px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.risk-wrap{display:flex;gap:28px;align-items:center;height:220px}.donut{width:160px;height:160px;border-radius:50%;position:relative}.donut:after{content:"36\A项行动";white-space:pre;display:grid;place-items:center;text-align:center;position:absolute;inset:31px;background:white;border-radius:50%;font-size:14px;font-weight:700}.risk-list{flex:1}.risk-item{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0}.risk-item span:last-child{font-weight:700}
+    table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line);padding:9px 7px}td{padding:10px 7px;border-bottom:1px solid #eef1f5}.pill{padding:3px 7px;border-radius:99px;font-size:10px}.High{background:#ffe8e8;color:#b52f2f}.Medium{background:#fff0d2;color:#966100}.Low{background:#dff7eb;color:#16724a}.foot{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:12px}.empty{display:grid;place-items:center;height:160px;color:var(--muted)}
+    @media(max-width:1050px){.kpis{grid-template-columns:repeat(3,1fr)}.grid,.grid.equal{grid-template-columns:1fr}.top{flex-direction:column}}@media(max-width:620px){.shell{padding:12px}.kpis{grid-template-columns:1fr 1fr}.bar-row{grid-template-columns:80px 1fr 70px}.card{padding:14px}.top{padding:20px}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <section class="top">
+    <div><span class="badge">EXECUTIVE VIEW · 2025-08—2027-01</span><h1>GPU FinOps 管理驾驶舱</h1><div class="subtitle">成本归因 · 容量预测 · 优化收益 · SLA风险</div></div>
+    <div class="controls"><div class="control"><label>团队筛选</label><select id="teamFilter"><option value="ALL">全部团队</option></select></div><div class="control"><label>容量情景</label><select id="scenarioFilter"><option>Baseline</option><option selected>HighGrowth</option><option>Efficiency</option></select></div></div>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi accent"><div class="label">GPU账单总成本</div><div class="value" id="totalCost"></div><div class="note">12个月总账口径</div></div>
+    <div class="kpi warn"><div class="label">未使用承诺</div><div class="value" id="unused"></div><div class="note">单独展示，未重复计入</div></div>
+    <div class="kpi"><div class="label">当前GPU容量</div><div class="value" id="currentGpu"></div><div class="note">资源清单总量</div></div>
+    <div class="kpi warn"><div class="label">高增长容量需求</div><div class="value" id="highNeed"></div><div class="note">2027年1月，含峰值与备用</div></div>
+    <div class="kpi good"><div class="label">6个月理论节省</div><div class="value" id="sixSaving"></div><div class="note">仅On-Demand释放</div></div>
+    <div class="kpi good"><div class="label">年化节省上限</div><div class="value" id="annualSaving"></div><div class="note">含续约调整，不等于已实现</div></div>
+  </section>
+
+  <div class="insight"><b>管理结论</b><span>公司GPU总量暂时足够，但区域、型号和团队之间存在容量错配。优先共享与释放富余按需容量，再决定新增采购。</span></div>
+
+  <section class="grid">
+    <article class="card"><h2>月度GPU成本趋势</h2><p class="desc" id="costSubtitle">公司总账成本，按资源使用月份</p><svg id="costChart" class="chart" viewBox="0 0 720 230" preserveAspectRatio="none"></svg></article>
+    <article class="card"><h2>团队成本构成</h2><p class="desc">成本规模用于确定分析优先级，不直接等同浪费</p><div id="teamBars" class="bars"></div></article>
+  </section>
+
+  <section class="grid equal">
+    <article class="card"><h2>未来GPU容量情景</h2><p class="desc">包含历史峰值系数与SLA最低备用比例</p><div class="legend"><span><i class="dot" style="background:#2878ff"></i>预测需求</span><span><i class="dot" style="background:#9ba6b5"></i>当前容量 1,016</span></div><svg id="capacityChart" class="chart" viewBox="0 0 620 230" preserveAspectRatio="none"></svg></article>
+    <article class="card"><h2>优化行动与收益</h2><p class="desc">近期节省、续约节省与避免采购严格分开</p><div id="optimizationBars" class="bars"></div></article>
+  </section>
+
+  <section class="grid equal">
+    <article class="card"><h2>行动风险分布</h2><p class="desc">风险来自SLA敏感性与预测误差</p><div class="risk-wrap"><div id="riskDonut" class="donut"></div><div id="riskList" class="risk-list"></div></div></article>
+    <article class="card"><h2>优先行动清单</h2><p class="desc">按潜在财务影响排序；高风险行动必须先验证</p><table><thead><tr><th>行动</th><th>团队</th><th>型号</th><th>GPU</th><th>价值</th><th>风险</th></tr></thead><tbody id="actionTable"></tbody></table></article>
+  </section>
+  <div class="foot"><span>数据：合成AI公司业务 · 结果可追溯至账单、使用、SLA、预测和优化明细</span><span>金额为理论值，未扣除实施成本</span></div>
+</main>
+<script src="dashboard_data.js"></script>
+<script>
+const D=window.DASHBOARD_DATA, $=id=>document.getElementById(id);
+const money=v=>'$'+(v/1e6).toFixed(2)+'M', num=v=>Math.round(v).toLocaleString('en-US');
+function lineChart(el, rows, xKey, yKey, limit){
+  if(!rows.length){el.innerHTML='<text x="300" y="110" class="chart-label">暂无数据</text>';return}
+  const W=720,H=230,p={l:52,r:20,t:16,b:32}, max=Math.max(limit||0,...rows.map(r=>+r[yKey]))*1.08, min=0;
+  const x=i=>p.l+i*(W-p.l-p.r)/Math.max(1,rows.length-1), y=v=>p.t+(max-v)/(max-min)*(H-p.t-p.b);
+  let grid=''; for(let i=0;i<4;i++){const yy=p.t+i*(H-p.t-p.b)/3; grid+=`<line class="axis" x1="${p.l}" y1="${yy}" x2="${W-p.r}" y2="${yy}"/>`}
+  const points=rows.map((r,i)=>`${x(i)},${y(+r[yKey])}`).join(' '), area=`${p.l},${H-p.b} ${points} ${W-p.r},${H-p.b}`;
+  const labels=rows.map((r,i)=>i%2===0||rows.length<=7?`<text class="chart-label" x="${x(i)}" y="${H-9}" text-anchor="middle">${r[xKey].slice(5)}</text>`:'').join('');
+  el.innerHTML=`<defs><linearGradient id="costGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2878ff" stop-opacity=".28"/><stop offset="1" stop-color="#2878ff" stop-opacity="0"/></linearGradient></defs>${grid}<polygon class="area" points="${area}"/><polyline class="line" points="${points}"/>${rows.map((r,i)=>`<circle class="point" cx="${x(i)}" cy="${y(+r[yKey])}" r="3"/>`).join('')}${labels}<text class="chart-label" x="4" y="20">${num(max)}</text>`;
+}
+function bars(el,rows,label,value,formatter,color=false){const max=Math.max(...rows.map(r=>+r[value]),1);el.innerHTML=rows.map((r,i)=>`<div class="bar-row"><span>${r[label]}</span><div class="bar-track"><div class="bar-fill" style="width:${100*r[value]/max}%;${color?'background:'+color[i%color.length]:''}"></div></div><span class="money">${formatter(+r[value])}</span></div>`).join('')}
+function renderCost(team){const rows=team==='ALL'?D.monthly_cost:D.monthly_team_cost.filter(r=>r.team_id===team);$('costSubtitle').textContent=team==='ALL'?'公司总账成本，按资源使用月份':team+' 月度归因成本';lineChart($('costChart'),rows,'usage_month','cost_usd')}
+function renderCapacity(scenario){const rows=D.capacity.filter(r=>r.scenario===scenario);lineChart($('capacityChart'),rows,'forecast_month','planned_gpu_count',1016)}
+function renderActions(team){let rows=D.top_actions;if(team!=='ALL')rows=rows.filter(r=>r.source_team===team||r.target_team===team);$('actionTable').innerHTML=rows.length?rows.map(r=>`<tr><td>${({ReleaseOnDemand:'释放按需',RightSizeAtRenewal:'续约降量',ShareCapacity:'容量共享',CapacityGap:'容量缺口'})[r.action_type]||r.action_type}</td><td>${r.source_team||r.target_team}</td><td>${r.gpu_model}</td><td>${r.gpu_count}</td><td>${money(r.displayed_value)}</td><td><span class="pill ${r.risk_level}">${r.risk_level}</span></td></tr>`).join(''):'<tr><td colspan="6" class="empty">该团队暂无前八项行动</td></tr>'}
+function init(){const k=D.kpis;$('totalCost').textContent=money(k.total_cost_usd);$('unused').textContent=money(k.unused_commitment_usd);$('currentGpu').textContent=num(k.current_gpu_count);$('highNeed').textContent=num(k.high_growth_gpu_need);$('sixSaving').textContent=money(k.six_month_savings_usd);$('annualSaving').textContent=money(k.annualized_savings_usd);
+  D.team_cost.forEach(r=>$('teamFilter').insertAdjacentHTML('beforeend',`<option>${r.team_id}</option>`));bars($('teamBars'),D.team_cost,'team_id','cost_usd',money);const opt=D.optimization.map(r=>({...r,label:({ReleaseOnDemand:'按需释放',RightSizeAtRenewal:'续约降量',ShareCapacity:'容量共享',CapacityGap:'剩余缺口'})[r.action_type],value:r.six_month_savings_usd||r.annualized_savings_usd||r.avoided_purchase_cost_usd}));bars($('optimizationBars'),opt,'label','value',money,['#2ca66f','#2878ff','#12b8c4','#e45454']);
+  const counts=Object.fromEntries(D.risk.map(r=>[r.risk_level,r.action_count])),total=Object.values(counts).reduce((a,b)=>a+b,0),h=360*(counts.High||0)/total,m=360*(counts.Medium||0)/total;$('riskDonut').style.background=`conic-gradient(#e45454 0 ${h}deg,#f5a623 ${h}deg ${h+m}deg,#2ca66f ${h+m}deg 360deg)`;$('riskList').innerHTML=[['High','#e45454'],['Medium','#f5a623'],['Low','#2ca66f']].map(([r,c])=>`<div class="risk-item"><span><i class="dot" style="background:${c}"></i>${r}</span><span>${counts[r]||0}</span></div>`).join('');renderCost('ALL');renderCapacity('HighGrowth');renderActions('ALL')}
+$('teamFilter').addEventListener('change',e=>{renderCost(e.target.value);renderActions(e.target.value)});$('scenarioFilter').addEventListener('change',e=>renderCapacity(e.target.value));init();
+</script>
+</body>
+</html>

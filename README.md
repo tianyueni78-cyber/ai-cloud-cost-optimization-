@@ -1,155 +1,125 @@
 # AI Cloud Cost Optimization
 
-一个基于虚拟 B2B AI 公司的端到端云成本分析作品集。
+一个面向云基础设施与FinOps岗位的端到端GPU成本优化作品集。项目基于一家虚拟B2B AI公司的12个月业务数据，从数据审计、成本归因和根因分析出发，完成业务预测、容量规划、优化测算和管理层交付。
 
-本项目模拟一家同时运行模型训练与在线推理业务的 AI 公司。项目将从原始云资源使用、账单、资源清单、SLA 和业务事件数据出发，完成数据审计、成本归因、趋势预测、资源优化、仪表盘设计和管理层汇报。
+![GPU FinOps管理驾驶舱](dashboard/preview.png)
 
-> 项目状态：已完成数据准备、数据审计和 Pandas 清洗管道，正在进入 SQL 探索分析。
+## 项目成果
 
-快速入口：[学习入口](learning/README.md) · [九阶段模板](learning/数据分析九阶段填空模板.md) · [指标与数据映射](learning/指标与数据映射.md) · [公司背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md) · [工作模拟练习册](workbook.md)
+| 指标 | 结果 |
+|---|---:|
+| 12个月GPU账单总成本 | $21.46M |
+| 未使用承诺 | $7.84M |
+| 当前GPU容量 | 1,016张 |
+| 2027年1月高增长容量需求 | 942张 |
+| 6个月理论节省 | $1.56M |
+| 年化理论节省上限 | $5.91M |
+| 容量共享避免采购成本 | $0.19M |
 
-## 业务背景
+核心判断：公司GPU总量暂时足够，但区域、型号和团队之间存在容量错配。优先共享容量、释放富余On-Demand资源，并在续约时调整承诺采购；不能把低利用率直接等同于可回收资源。
 
-虚拟公司向企业客户提供企业搜索、智能客服、文档智能和托管模型端点服务。
+## 快速查看
 
-公司拥有七个业务与技术团队，在两个云区域运行 A100、H100 和 L40S 等 GPU 资源，工作负载同时覆盖：
+- [管理层摘要](reports/executive_summary.md)
+- [交互式管理仪表盘](dashboard/index.html)
+- [数据审计报告](reports/data_audit.md)
+- [成本基线](reports/cost_baseline.md)
+- [成本归因](reports/cost_attribution.md)
+- [根因分析](reports/root_cause_analysis.md)
+- [业务量与容量预测](reports/forecast_capacity.md)
+- [优化方案](reports/optimization.md)
+- [业务背景](docs/company_background.md) · [数据字典](docs/data_dictionary.md)
 
-- 模型训练
-- 在线推理
-- 批量推理
-- 检索与重排
-- 内容安全
-- 应用研究
+下载仓库后双击 `dashboard/index.html`，即可使用团队与容量情景筛选器查看仪表盘，不需要Power BI或外部图表服务。
 
-各团队具有不同的业务增长速度、SLA、资源使用模式和采购策略。云资源采用 Reserved、Savings Plan、On-demand 和自有容量等多种方式采购。
+## 业务问题
 
-## 项目目标
+项目帮助云基础设施负责人在不破坏团队SLA、且必须支持未来业务增长的约束下，决定：
 
-本项目将回答以下业务问题：
+1. 如何调整On-Demand、Reserved和Savings Plan采购组合；
+2. 哪些团队和GPU资源可以安全缩容或共享；
+3. 未来6个月业务量和GPU容量需求是多少；
+4. 优化行动可以产生多少节省，风险与实施顺序是什么。
 
-1. 当前云资源和账单数据是否完整、准确并可用于决策？
-2. 云成本应如何归因到团队、产品和工作负载？
-3. 成本增长来自业务增长、资源效率下降，还是采购方式不合理？
-4. 哪些低利用率资源可以优化，哪些必须因 SLA 或容灾要求保留？
-5. Reserved 和 On-demand 的组合是否合理？
-6. 未来业务增长需要多少 GPU 容量和预算？
-7. 如何在控制成本的同时满足性能、容量和 SLA 要求？
-8. 如何向管理层清晰说明节省机会、风险和实施顺序？
+分析范围为2025年8月至2026年7月的生产团队与GPU资源池；预测范围为2026年8月至2027年1月。
 
-## 数据集
-
-项目使用连续 12 个月的模拟业务数据，时间范围为 2025-08-01 至 2026-07-31。
-
-| 文件 | 内容 |
-|---|---|
-| `resource_usage.csv` | 小时级 GPU 使用率、资源分配、吞吐量、延迟和可用性 |
-| `cloud_billing.csv` | 云账单、承诺费用、On-demand 费用、抵扣和调整项 |
-| `team_sla.csv` | 团队、产品和工作负载的 SLA 与关键等级 |
-| `resource_inventory.csv` | GPU 类型、数量、区域、归属、采购方式和生命周期 |
-| `business_events.csv` | 产品发布、客户上线、训练任务、事故和采购事件 |
-
-数据为合成数据，不包含真实公司、客户或云账户信息。数据中保留了现实业务常见的数据质量问题和运营噪声。
-
-## 分析流程
-
-项目分为七个阶段：
-
-1. Data Audit
-2. SQL Analysis
-3. Cost Attribution
-4. Forecasting
-5. Optimization
-6. Dashboard
-7. Executive Summary
-
-每个阶段都将保留分析假设、处理方法、验证过程和业务解释，而不仅展示最终图表。
-
-## 项目结构
+## 分析方法
 
 ```text
-ai-cloud-cost-optimization/
-├── data/
-│   ├── sample/                   # GitHub 快速预览用的小样本
-│   ├── resource_usage.csv        # 小时级 GPU 使用与业务量数据
-│   ├── cloud_billing.csv         # 云账单与采购费用明细
-│   ├── team_sla.csv              # 团队 SLA 与业务关键等级
-│   ├── resource_inventory.csv    # GPU 资源池与采购信息
-│   ├── business_events.csv       # 业务、技术和采购事件
-│   ├── manifest.md               # 文件行数、大小与校验值
-│   └── README.md                 # 数据目录使用说明
-├── docs/
-│   ├── company_background.md     # 完整公司与业务背景
-│   └── data_dictionary.md        # 字段定义、单位与业务规则
-├── learning/
-│   ├── README.md                 # 唯一学习入口
-│   ├── 数据分析九阶段填空模板.md  # 思路、模板、避坑和完成标准
-│   ├── 指标与数据映射.md          # 场景、完整公式和数据映射
-│   ├── 成果交付指南.md            # Power BI、管理摘要和作品集
-│   └── references/               # SQL、Pandas、Power BI 按需速查
-├── sql/                          # 你完成的 SQL 查询
-├── notebooks/                    # 清洗、归因、预测与优化分析
-├── src/
-│   └── clean_data.py             # 五表 Pandas 清洗管道
-├── tests/
-│   └── test_clean_data.py        # 清洗规则自动测试
-├── outputs/                      # 本地清洗结果，不上传 GitHub
-├── dashboard/                    # Power BI 文件与仪表盘截图
-├── reports/
-│   ├── data_inventory.md         # 五张原始数据表盘点
-│   └── data_audit.md             # 数据审计报告
-├── workbook.md                   # 七阶段工作模拟练习册
-├── README.md                     # 作品集首页
-└── LICENSE                       # MIT 许可证
+业务与指标定义
+→ 数据审计与Pandas清洗
+→ SQL成本基线与归因
+→ 成本、业务量、单位成本和利用率根因分析
+→ 滚动回测与六个月情景预测
+→ 峰值系数和SLA备用容量换算
+→ 采购、共享与缩扩容优化
+→ 仪表盘和管理层摘要
 ```
 
-完整数据已经保存在 `data/`；`data/sample/` 中的同名文件用于在 GitHub 页面快速预览。
+关键方法：
 
-## 运行数据清洗
+- 保留原始CSV，只向 `outputs/` 写入清洗结果；
+- 对完全重复和修订记录采用不同去重规则；
+- 账单关联前后执行行数与金额对账；
+- `requests`、`jobs`、`k_pages` 分开预测，避免混合业务单位；
+- 在移动均值与线性趋势之间滚动回测选择模型；
+- 容量需求包含历史峰值系数和SLA最低备用比例；
+- 共享、按需释放和续约节省互斥计算，防止重复收益。
+
+## 关键洞察
+
+- FMT与RES训练单位成本分别上升约56%和57.25%，是优先优化对象。
+- CONV推理成本增长90.46%，但请求量增长157.52%，单位成本下降26.04%，属于健康增长。
+- 预计可释放71张富余On-Demand GPU，6个月理论节省$1.56M。
+- 15张同区域、同型号、同负载容量可以进入共享验证，避免采购约$0.19M。
+- 续约时有128张承诺容量调整候选，年化理论节省约$2.81M。
+- 严格匹配区域和型号后仍有159张保守缺口，不能用公司总量余量掩盖局部短缺。
+
+## 数据与技术
+
+项目包含五张相互关联的合成数据表：小时级资源使用、云账单、资源清单、团队SLA和业务事件。数据覆盖A100、H100、L40S，多种采购方式以及训练、推理和批处理负载。
+
+技术栈：
+
+- DuckDB / SQL：数据盘点、审计、成本基线、归因与根因分析；
+- Python / Pandas：数据清洗、预测、容量换算和优化测算；
+- HTML / CSS / JavaScript：无外部依赖的交互式管理仪表盘；
+- unittest：清洗、预测、优化和仪表盘指标规则验证；
+- Git / GitHub：版本管理与作品集交付。
+
+## 复现
+
+在项目根目录创建并激活Python环境后运行：
 
 ```powershell
+pip install pandas duckdb
 python -m unittest discover -s tests -v
 python src/clean_data.py
 python src/forecast_capacity.py
 python src/optimize_resources.py
+python src/build_dashboard.py
 ```
 
-第一条命令验证清洗、预测与优化规则，其余命令依次生成清洗数据、预测结果和优化建议。原始 `data/` 不会被修改，`outputs/` 不上传 GitHub。
+生成结果位于本地 `outputs/`，该目录不上传GitHub。仪表盘数据写入 `dashboard/dashboard_data.js`，然后双击 `dashboard/index.html` 查看。
 
-## 项目进度
+## 项目结构
 
-- [x] 准备业务背景和原始数据
-- [x] 完成数据字典
-- [x] 完成数据质量审计
-- [x] 建立 Pandas 数据清洗管道
-- [x] 完成 SQL 探索分析
-- [x] 建立成本归因模型
-- [x] 完成成本与容量预测
-- [x] 制定优化方案
-- [ ] 创建管理仪表盘
-- [ ] 完成管理层摘要
+```text
+├── data/                 # 五张原始CSV与GitHub预览样本
+├── docs/                 # 公司背景和数据字典
+├── sql/portfolio/        # 审计、成本、归因和根因分析SQL
+├── src/                  # 清洗、预测、优化和仪表盘数据程序
+├── tests/                # 自动化规则测试
+├── dashboard/            # 可打开的管理仪表盘、数据与截图
+├── reports/              # 各阶段分析报告和管理层摘要
+├── outputs/              # 本地生成结果，不提交Git
+└── workbook.md           # 原始业务练习任务
+```
 
-## 分析原则
+## 数据说明
 
-- 不把低利用率直接等同于资源浪费。
-- 同时考虑成本、业务量、性能、SLA 和容量风险。
-- 明确区分事实、假设和建议。
-- 所有关键结论都应能够追溯到原始数据。
-- 优化建议需说明预计收益、实施条件和潜在风险。
-
-## 技术工具
-
-具体工具将在分析过程中根据任务需要选择，预计包括：
-
-- SQL
-- Python / Pandas
-- Jupyter Notebook
-- Power BI、Tableau 或其他可视化工具
-- Git 和 GitHub
-
-## 免责声明
-
-本项目中的公司、团队、资源、合同、业务事件和账单数据均为虚构或合成内容，仅用于学习和作品展示，不代表任何真实企业的经营情况。
+公司、团队、合同、业务事件和账单均为虚构或合成内容，仅用于学习和作品展示，不包含真实企业或客户信息。分析中的节省为理论毛收益，未扣除迁移、测试和实施成本，不代表实际财务承诺。
 
 ## License
 
-本项目采用 [MIT License](LICENSE)。
+[MIT License](LICENSE)
