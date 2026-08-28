@@ -110,9 +110,10 @@ ai-cloud-cost-optimization/
 python -m unittest discover -s tests -v
 python src/clean_data.py
 python src/forecast_capacity.py
+python src/optimize_resources.py
 ```
 
-第一条命令验证清洗与预测规则，第二条命令生成清洗数据，第三条命令生成业务量与GPU容量预测。原始 `data/` 不会被修改，`outputs/` 不上传 GitHub。
+第一条命令验证清洗、预测与优化规则，其余命令依次生成清洗数据、预测结果和优化建议。原始 `data/` 不会被修改，`outputs/` 不上传 GitHub。
 
 ## 项目进度
 
@@ -123,7 +124,7 @@ python src/forecast_capacity.py
 - [x] 完成 SQL 探索分析
 - [x] 建立成本归因模型
 - [x] 完成成本与容量预测
-- [ ] 制定优化方案
+- [x] 制定优化方案
 - [ ] 创建管理仪表盘
 - [ ] 完成管理层摘要
 
