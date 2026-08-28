@@ -109,9 +109,10 @@ ai-cloud-cost-optimization/
 ```powershell
 python -m unittest discover -s tests -v
 python src/clean_data.py
+python src/forecast_capacity.py
 ```
 
-第一条命令验证清洗规则，第二条命令在 `outputs/cleaned/` 生成五张清洗 CSV 和 `quality_summary.csv`。原始 `data/` 不会被修改，`outputs/` 不上传 GitHub。
+第一条命令验证清洗与预测规则，第二条命令生成清洗数据，第三条命令生成业务量与GPU容量预测。原始 `data/` 不会被修改，`outputs/` 不上传 GitHub。
 
 ## 项目进度
 
@@ -119,9 +120,9 @@ python src/clean_data.py
 - [x] 完成数据字典
 - [x] 完成数据质量审计
 - [x] 建立 Pandas 数据清洗管道
-- [ ] 完成 SQL 探索分析
-- [ ] 建立成本归因模型
-- [ ] 完成成本与容量预测
+- [x] 完成 SQL 探索分析
+- [x] 建立成本归因模型
+- [x] 完成成本与容量预测
 - [ ] 制定优化方案
 - [ ] 创建管理仪表盘
 - [ ] 完成管理层摘要
